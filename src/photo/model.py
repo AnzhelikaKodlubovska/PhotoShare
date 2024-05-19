@@ -1,8 +1,8 @@
 from typing import Optional, List
 from pydantic import BaseModel, ConfigDict
 
-# from comment.model import CommentModel
-# from tags.model import TagModel
+import comment.model as comment_models
+import tags.model as tag_models
 
 
 class PhotoModel(BaseModel):
@@ -21,7 +21,7 @@ class PhotoUpdate(BaseModel):
 class PhotoResponse(PhotoModel):
     id: int
     url: str
-    comments: List["CommentModel"] = []
-    tags: List["TagModel"] = []
+    comments: List[comment_models.CommentModel] = []
+    tags: List[tag_models.TagModel] = []
 
     model_config = ConfigDict(from_attributes=True)

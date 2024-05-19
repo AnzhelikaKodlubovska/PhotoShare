@@ -43,7 +43,7 @@ async def full_name_calculated_update(context) -> Any:
     id_ = await context.get_current_parameters().get('id_1')
     if id_ is None:
         return
-    with get_db() as session:
+    async with get_db() as session:
         current = await session.get(ProfileORM, id_)
         first = first if first is not None else current.first_name
         last = last if last is not None else current.last_name
@@ -69,7 +69,7 @@ class UserORM(Base):
         default=datetime.now(timezone.utc)
     )
     profile: Mapped["ProfileORM"] = relationship(back_populates="user")
-    role: Mapped[Role] = mapped_column(String(20), default="user")
+    role: Mapped[Role] = mapped_column(String(10), default="user")
 
 
 class ProfileORM(Base):
@@ -85,8 +85,6 @@ class ProfileORM(Base):
                                            unique=True,
                                            default=full_name_calculated_default,
                                            onupdate=full_name_calculated_update)
-    email: Mapped[Optional[str]] = mapped_column(String(80),
-                                                 unique=True)
     birthday: Mapped[Optional[date]] = mapped_column(Date())
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     user: Mapped[UserORM] = relationship(back_populates='profile')

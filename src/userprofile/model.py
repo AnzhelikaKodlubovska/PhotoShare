@@ -9,12 +9,15 @@ from pydantic import (BaseModel,
 
 from userprofile.orm import Role
 
+import photo.model as photo_models
+import comment.model as comment_models
+
 
 class UserAuthModel(BaseModel):
     """
     Model that is used to meet OAuth2 requirements
     """
-    username: EmailStr
+    username: str
     password: str
 
 
@@ -41,8 +44,8 @@ class UserProfileModel(BaseModel):
     birthday: Optional[PastDate]
     registered_at: datetime = Field(default=datetime.now(timezone.utc))
     role: Role = Field(default='user')
-    photos: Optional[List["PhotoModel"]] = []
-    comments: Optional[List["CommentModel"]] = []
+    photos: Optional[List[photo_models.PhotoModel]] = []
+    comments: Optional[List[comment_models.CommentModel]] = []
 
     @computed_field
     @property
@@ -58,24 +61,36 @@ class UserProfileModel(BaseModel):
         return self.first_name + lname
 
 
+class UserEditableProfileModel(BaseModel):
+    """
+    Model that holds all user information
+    """
+    username: str
+    first_name: Optional[str]
+    last_name: Optional[str]
+    email: Optional[EmailStr]
+    birthday: Optional[PastDate]
+
+
 class TokenModel(BaseModel):
     access_token: str
     refresh_token: str
     email_token: str
     token_type: str = "bearer"
 
+
 class UserPublicProfileModel(BaseModel):
     """
     Model that holds public user information
     """
     model_config = ConfigDict(from_attributes=True)
-    username: str = Field()
+    username: str
     first_name: str
     last_name: Optional[str]
     registered_at: datetime = Field(default=datetime.now(timezone.utc))
     role: Role = Field(default='user')
-    photos: PositiveInt = Field(default=0)
-    comments: PositiveInt = Field(default=0)
+    photos: int = Field(ge=0, default=0)
+    comments: int = Field(ge=0, default=0)
 
     @computed_field
     @property

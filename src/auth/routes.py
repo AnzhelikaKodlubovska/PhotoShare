@@ -9,7 +9,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 from starlette.requests import Request
 
-from userprofile.model import TokenModel, UserAuthModel, UserDBModel
+import userprofile.model as user_models
 from database import get_db
 
 from auth.service import Authentication
@@ -23,9 +23,9 @@ auth_service = Authentication()
 
 
 @router.post("/register",
-             response_model=UserDBModel,
+             response_model=user_models.UserDBModel,
              responses={409: {"description": "User already exists"},
-                        201: {"model": UserDBModel}})
+                        201: {"model": user_models.UserDBModel}})
 async def new_user(
         user: UserAuthModel,
         db: Annotated[AsyncSession, Depends(get_db)],
@@ -78,13 +78,13 @@ async def new_user(
 
     return JSONResponse(
         status_code=201,
-        content={**UserDBModel.from_orm(ret_user).dict(exclude={"id"}),
+        content={**user_models.UserDBModel.from_orm(ret_user).dict(exclude={"id"}),
                  'confirmation': res['message']}
     )
 
 
 @router.post("/login",
-             response_model=TokenModel)
+             response_model=user_models.TokenModel)
 async def login(
         user: Annotated[OAuth2PasswordRequestForm, Depends()],
         db: Annotated[AsyncSession, Depends(get_db)]
@@ -145,7 +145,7 @@ async def login(
     )
 
 
-@router.post("/refresh", response_model=TokenModel)
+@router.post("/refresh", response_model=user_models.TokenModel)
 async def refresh(
         request: Request,
         user: Annotated[UserORM, Depends(auth_service.get_refresh_user)]
