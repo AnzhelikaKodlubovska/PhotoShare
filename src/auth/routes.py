@@ -27,7 +27,7 @@ auth_service = Authentication()
              responses={409: {"description": "User already exists"},
                         201: {"model": user_models.UserDBModel}})
 async def new_user(
-        user: UserAuthModel,
+        user: user_models.UserAuthModel,
         db: Annotated[AsyncSession, Depends(get_db)],
         bg_task: BackgroundTasks
 ) -> Any:
