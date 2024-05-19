@@ -9,14 +9,15 @@ from sqlalchemy.orm import selectinload
 
 from database import get_db
 from auth.service import Authentication as auth_service
-from userprofile.model import UserPublicProfileModel, UserProfileModel
+import userprofile.model as user_models
 from userprofile.orm import ProfileORM, UserORM
 
 
 router = APIRouter(prefix="/user", tags=["User profile"])
 
 
-@router.get("/profiles", response_model=List[UserPublicProfileModel])
+@router.get("/profiles",
+            response_model=List[user_models.UserPublicProfileModel])
 async def get_all_profiles(
         db: Annotated[AsyncSession, Depends(get_db)],
         offset: int = 0,
@@ -55,13 +56,15 @@ async def get_all_profiles(
             profile_dump['comments'] = len(profile.comments)
             profile_dump['username'] = profile.user.username
             profile_dump['email'] = profile.user.email
-            public_profile = UserPublicProfileModel(**profile_dump)
+            public_profile = user_models.UserPublicProfileModel(
+                **profile_dump
+            )
             return_res.append(public_profile)
     return return_res
 
 
 @router.get("/profile/{username: str}",
-            response_model=UserPublicProfileModel)
+            response_model=user_models.UserPublicProfileModel)
 async def get_user_profile(
         username: str,
         db: Annotated[AsyncSession, Depends(get_db)]
@@ -95,7 +98,7 @@ async def get_user_profile(
     profile_dump['username'] = profile.user.username
     profile_dump['email'] = profile.user.email
 
-    return UserPublicProfileModel(**profile_dump)
+    return user_models.UserPublicProfileModel(**profile_dump)
 
 
 # @router.get("/profile/me",

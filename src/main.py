@@ -4,13 +4,13 @@ from fastapi import FastAPI
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 
-from auth.routes import router as auth_router
-from email_service.routes import router as email_router
-from comment.routes import router as comment_router
-from photo.routes import router as photo_router
-from userprofile.routes import router as user_router
-from frontend.routes import router as frontend_router
-from tags.routes import router as tags_router
+import auth.routes as auth_router
+import email_service.routes as email_router
+import comment.routes as comment_router
+import photo.routes  as photo_router
+import userprofile.routes as user_router
+import frontend.routes as frontend_router
+import tags.routes as tags_router
 
 import middlewares.crutches as crutches
 
@@ -19,13 +19,13 @@ app = FastAPI()
 static_path = Path(__file__).parent / 'frontend' / 'static'
 app.mount("/static", StaticFiles(directory=static_path), name='static')
 
-app.include_router(auth_router)
-app.include_router(email_router)
-app.include_router(comment_router)
-app.include_router(photo_router)
-app.include_router(user_router)
-app.include_router(frontend_router)
-app.include_router(tags_router)
+app.include_router(auth_router.router)
+app.include_router(email_router.router)
+app.include_router(comment_router.router)
+app.include_router(photo_router.router)
+app.include_router(user_router.router)
+app.include_router(frontend_router.router)
+app.include_router(tags_router.router)
 
 
 @app.middleware('http')
